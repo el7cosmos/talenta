@@ -1,0 +1,21 @@
+name: Talenta
+version: "1.0.0"
+author: el7cosmos <el@elabee.me>
+settings:
+  - ColoredHelp
+  - DeriveDisplayOrder
+  - SubcommandRequiredElseHelp
+  - VersionlessSubcommands
+subcommands:
+  - login:
+      settings:
+        - ColoredHelp
+      args:
+        - email:
+            long: email
+            value_name: EMAIL
+            takes_value: true
+        - password:
+            long: password
+            value_name: PASSWORD
+            takes_value: true
