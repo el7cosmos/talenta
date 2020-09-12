@@ -1,10 +1,11 @@
 use crate::{client, Config};
 use ansi_term::Colour;
-use clap::ArgMatches;
+use clap::{ArgMatches, Error, ErrorKind};
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::{Input, Password};
+use reqwest::StatusCode;
+use std::io::{self, Write};
 use std::process;
-use user_error::{UserFacingError, UFE};
 
 pub(crate) fn login(matches: &ArgMatches) {
     let theme = ColorfulTheme::default();
@@ -27,23 +28,25 @@ pub(crate) fn login(matches: &ArgMatches) {
 
     match client::login(&email, &password) {
         Ok(login) => {
-            if login.status == 200 {
-                Config::with_token(login.data.unwrap().token)
-                    .store()
-                    .unwrap();
-                println!("{}", Colour::Green.bold().paint(login.message));
-                process::exit(exitcode::OK)
-            } else {
-                let status = reqwest::StatusCode::from_u16(login.status).unwrap();
-                UserFacingError::new(status.to_string())
-                    .reason(login.message)
-                    .print();
-                process::exit(exitcode::NOUSER)
+            let status = StatusCode::from_u16(login.status).unwrap();
+            match status.is_success() {
+                true => {
+                    Config::with_token(login.data.unwrap().token)
+                        .store()
+                        .unwrap();
+
+                    success(&login.message)
+                }
+                false => Error::with_description(&login.message, ErrorKind::ValueValidation).exit(),
             }
         }
-        Err(err) => {
-            UserFacingError::from(err).print();
-            process::exit(exitcode::NOUSER);
-        }
+        Err(err) => Error::with_description(&err.to_string(), ErrorKind::ValueValidation).exit(),
     }
+}
+
+fn success(message: &str) -> ! {
+    let out = io::stdout();
+    writeln!(&mut out.lock(), "{}", Colour::Green.bold().paint(message))
+        .expect("Error writing Error to stdout");
+    process::exit(0)
 }

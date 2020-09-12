@@ -225,12 +225,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "exitcode"
-version = "1.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de853764b47027c2e862a995c34978ffa63c1501f2e15f987ba11bd4f9bba193"
-
-[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -969,11 +963,9 @@ dependencies = [
  "clap",
  "confy",
  "dialoguer",
- "exitcode",
  "reqwest",
  "serde",
  "url",
- "user-error",
 ]
 
 [[package]]
@@ -1167,12 +1159,6 @@ dependencies = [
  "matches",
  "percent-encoding",
 ]
-
-[[package]]
-name = "user-error"
-version = "1.2.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07a91d0648d862a02d641c82292791accfe66d36df75d8149ebc9768f2e36863"
 
 [[package]]
 name = "vcpkg"
