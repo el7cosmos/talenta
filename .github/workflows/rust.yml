@@ -12,11 +12,20 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
+    - if: matrix.os == 'macos-latest'
+      run: |
+        brew install gnu-tar
+        echo "::add-path::/usr/local/opt/gnu-tar/libexec/gnubin"
     - uses: actions/cache@v2
+      if: matrix.os != 'macos-latest'
       with:
         path: |
           ~/.cargo/registry
