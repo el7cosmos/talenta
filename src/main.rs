@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate clap;
 
+use crate::client::Client;
+use crate::command::Command;
 use confy::ConfyError;
 use serde::{Deserialize, Serialize};
 
@@ -30,11 +32,17 @@ impl Config {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let yaml = load_yaml!("../cli.yml");
-    let app = clap::App::from_yaml(yaml);
-    let matches = app.get_matches();
+    let matches = clap::App::from_yaml(yaml).get_matches();
+
+    let theme = dialoguer::theme::ColorfulTheme::default();
+    let command = Command::new(
+        Client::new(reqwest::blocking::Client::new()),
+        Config::load()?,
+        &theme,
+    );
 
     match matches.subcommand_name() {
-        Some("login") => command::login(matches.subcommand_matches("login").unwrap()),
+        Some("login") => command.login(matches.subcommand_matches("login").unwrap()),
         Some(&_) => {}
         None => {}
     }
