@@ -1,15 +1,14 @@
 name: Talenta
 version: "1.0.0"
 author: el7cosmos <el@elabee.me>
-settings:
+global_settings:
   - ColoredHelp
+settings:
   - DeriveDisplayOrder
   - SubcommandRequiredElseHelp
   - VersionlessSubcommands
 subcommands:
   - login:
-      settings:
-        - ColoredHelp
       args:
         - email:
             long: email
