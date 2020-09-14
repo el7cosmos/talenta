@@ -25,7 +25,6 @@ jobs:
         brew install gnu-tar
         echo "::add-path::/usr/local/opt/gnu-tar/libexec/gnubin"
     - uses: actions/cache@v2
-      if: matrix.os != 'macos-latest'
       with:
         path: |
           ~/.cargo/registry

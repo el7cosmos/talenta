@@ -4,27 +4,42 @@ use std::collections::HashMap;
 use url::{ParseError, Url};
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct ApiResponse<T> {
-    pub(crate) message: String,
-    pub(crate) status: u16,
-    pub(crate) data: Option<T>,
+pub(super) struct ApiResponse<T> {
+    message: String,
+    status: u16,
+    data: Option<T>,
+}
+
+impl<T> ApiResponse<T> {
+    pub(super) fn message(&self) -> &str {
+        &self.message
+    }
+    pub(super) fn status(&self) -> u16 {
+        self.status
+    }
+    pub(super) fn data(&self) -> &Option<T> {
+        &self.data
+    }
 }
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct LoginData {
-    pub(crate) token: String,
+pub(super) struct LoginData {
+    token: String,
 }
 
-pub(crate) struct Client {
+impl LoginData {
+    pub(super) fn token(&self) -> &str {
+        &self.token
+    }
+}
+
+#[derive(Default, Debug)]
+pub(super) struct Client {
     client: blocking::Client,
 }
 
 impl Client {
-    pub(crate) fn new(client: blocking::Client) -> Self {
-        Client { client }
-    }
-
-    pub(crate) fn login(
+    pub(super) fn login(
         &self,
         email: &str,
         password: &str,

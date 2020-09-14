@@ -1,51 +1,41 @@
-#[macro_use]
-extern crate clap;
-
-use crate::client::Client;
-use crate::command::Command;
-use confy::ConfyError;
-use serde::{Deserialize, Serialize};
+use crate::login::Login;
+use ansi_term::Colour;
+use std::io::Write;
+use std::{io, process};
+use structopt::clap::AppSettings;
+use structopt::StructOpt;
 
 mod client;
-mod command;
+mod config;
+mod login;
 
-const PKG_NAME: &str = env!("CARGO_PKG_NAME");
+trait Command {
+    fn run(&self);
 
-#[derive(Default, Serialize, Deserialize, Debug)]
-struct Config {
-    token: String,
-}
-
-impl Config {
-    fn load() -> Result<Self, ConfyError> {
-        confy::load(PKG_NAME)
-    }
-
-    fn with_token(token: String) -> Config {
-        Config { token }
-    }
-
-    fn store(&self) -> Result<(), ConfyError> {
-        confy::store(PKG_NAME, self)
+    fn success(message: &str) -> ! {
+        let out = io::stdout();
+        writeln!(&mut out.lock(), "{}", Colour::Green.bold().paint(message))
+            .expect("Error writing Error to stdout");
+        process::exit(0)
     }
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let yaml = load_yaml!("../cli.yml");
-    let matches = clap::App::from_yaml(yaml).get_matches();
+#[derive(StructOpt)]
+#[structopt(global_settings(& [AppSettings::ColoredHelp, AppSettings::DeriveDisplayOrder, AppSettings::VersionlessSubcommands]))]
+struct App {
+    #[structopt(subcommand)]
+    cmd: RootCommand,
+}
 
-    let theme = dialoguer::theme::ColorfulTheme::default();
-    let command = Command::new(
-        Client::new(reqwest::blocking::Client::new()),
-        Config::load()?,
-        &theme,
-    );
+#[derive(StructOpt)]
+enum RootCommand {
+    Login(Login),
+}
 
-    match matches.subcommand_name() {
-        Some("login") => command.login(matches.subcommand_matches("login").unwrap()),
-        Some(&_) => {}
-        None => {}
+fn main() {
+    let app: App = App::from_args();
+
+    match app.cmd {
+        RootCommand::Login(login) => login.run(),
     }
-
-    Ok(())
 }
