@@ -1,3 +1,10 @@
+## Installation
+
+### macOS Homebrew
+```sh
+brew install el7cosmos/brew/talenta
+```
+
 ## License
 
 Licensed under either of
