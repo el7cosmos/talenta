@@ -1,13 +1,13 @@
 mod checkin;
 mod checkout;
 
-use crate::attendance::checkin::Checkin;
-use crate::attendance::checkout::Checkout;
+use super::attendance::checkin::Checkin;
+use super::attendance::checkout::Checkout;
+use super::Command;
 use crate::client::Client;
 use crate::config::Config;
 use crate::date::Date;
 use crate::time::Time;
-use crate::Command;
 use ansi_term::Colour;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Input;
@@ -23,7 +23,7 @@ enum AttendanceCommand {
 
 #[derive(Default, StructOpt)]
 #[structopt(about = "Request attendance")]
-pub(super) struct Attendance {
+pub(crate) struct Attendance {
     #[structopt(skip)]
     client: Client,
     #[structopt(skip)]

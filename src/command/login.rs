@@ -1,6 +1,6 @@
+use super::Command;
 use crate::client::Client;
 use crate::config::Config;
-use crate::Command;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::{Input, Password};
 use reqwest::StatusCode;
@@ -8,15 +8,15 @@ use structopt::clap::{Error, ErrorKind};
 use structopt::StructOpt;
 
 #[derive(Default, StructOpt)]
-pub(super) struct Login {
+pub(crate) struct Login {
     #[structopt(skip)]
     client: Client,
     #[structopt(skip)]
     theme: ColorfulTheme,
 
-    #[structopt(long)]
+    #[structopt(long, value_name = "EMAIL")]
     email: Option<String>,
-    #[structopt(long)]
+    #[structopt(long, value_name = "PASSWORD")]
     password: Option<String>,
 }
 
