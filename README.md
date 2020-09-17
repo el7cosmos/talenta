@@ -2,6 +2,13 @@
 [![Crates.io](https://img.shields.io/crates/v/talenta?style=flat-square)](https://crates.io/crates/talenta)
 ![Crates.io](https://img.shields.io/crates/l/talenta?style=flat-square)
 
+---
+- [Installation](#installation)
+- [Usage](#usage)
+    - [Login](#login)
+    - [Request attendance](#request-attendance)
+---
+
 ## Installation
 
 ### Rust Cargo
@@ -13,6 +20,35 @@ cargo install talenta
 ```sh
 brew install el7cosmos/brew/talenta
 ```
+
+## Usage
+
+### Login
+```sh
+# Interactive
+talenta login
+
+# Non-interactive
+talenta login --email <EMAIL> --password <PASSWORD>
+```
+
+### Request attendance
+```sh
+# Interactive, use current date
+talenta attendance
+
+# Interactive, change attendance date
+talenta attendance --date <DATE>
+
+# Non-interactive, use current date
+talenta attendance --checkin-time <TIME> --checkout-time <TIME> --reason <reason>
+
+# Non-interactive, change attendance date
+talenta attendance --date <DATE> --checkin-time <TIME> --checkout-time <TIME> --reason <reason>
+```
+
+- `DATE`: ISO 8601 date format (`YYYY-mm-dd`)
+- `TIME`: Time in format `HH:MM`
 
 ## License
 
