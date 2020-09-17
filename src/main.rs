@@ -1,3 +1,4 @@
+use crate::attendance::Attendance;
 use crate::login::Login;
 use ansi_term::Colour;
 use std::io::Write;
@@ -5,9 +6,12 @@ use std::{io, process};
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
 
+mod attendance;
 mod client;
 mod config;
+mod date;
 mod login;
+mod time;
 
 trait Command {
     fn run(&self);
@@ -30,6 +34,7 @@ struct App {
 #[derive(StructOpt)]
 enum RootCommand {
     Login(Login),
+    Attendance(Attendance),
 }
 
 fn main() {
@@ -37,5 +42,6 @@ fn main() {
 
     match app.cmd {
         RootCommand::Login(login) => login.run(),
+        RootCommand::Attendance(attendance) => attendance.run(),
     }
 }

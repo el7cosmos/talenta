@@ -1,6 +1,8 @@
+use chrono::{NaiveDate, NaiveTime};
 use reqwest::blocking;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::error::Error;
 use url::{ParseError, Url};
 
 #[derive(Deserialize, Debug)]
@@ -23,6 +25,9 @@ impl<T> ApiResponse<T> {
 }
 
 #[derive(Deserialize, Debug)]
+pub(super) struct ResponseData {}
+
+#[derive(Deserialize, Debug)]
 pub(super) struct LoginData {
     token: String,
 }
@@ -31,6 +36,19 @@ impl LoginData {
     pub(super) fn token(&self) -> &str {
         &self.token
     }
+}
+
+#[allow(non_snake_case)]
+#[derive(Serialize, Debug)]
+struct AttendanceRequestBody {
+    datepicker_request_submit: String,
+    hour_checkin: Option<String>,
+    minute_checkin: Option<String>,
+    hour_checkout: Option<String>,
+    minute_checkout: Option<String>,
+    reason: String,
+    useCheckIn: bool,
+    useCheckOut: bool,
 }
 
 #[derive(Default, Debug)]
@@ -43,7 +61,7 @@ impl Client {
         &self,
         email: &str,
         password: &str,
-    ) -> Result<ApiResponse<LoginData>, Box<dyn std::error::Error>> {
+    ) -> Result<ApiResponse<LoginData>, Box<dyn Error>> {
         let mut map = HashMap::new();
         map.insert("email", email);
         map.insert("password", password);
@@ -51,6 +69,46 @@ impl Client {
             .client
             .post(Client::build_url("login")?)
             .json(&map)
+            .send()?
+            .json()?)
+    }
+
+    pub(super) fn attendance_request(
+        &self,
+        token: &str,
+        reason: &str,
+        date: NaiveDate,
+        checkin: Option<NaiveTime>,
+        checkout: Option<NaiveTime>,
+    ) -> Result<ApiResponse<ResponseData>, Box<dyn Error>> {
+        let json = AttendanceRequestBody {
+            datepicker_request_submit: date.to_string(),
+            hour_checkin: match checkin {
+                Some(time) => Some(time.format("%H").to_string()),
+                None => None,
+            },
+            minute_checkin: match checkin {
+                Some(time) => Some(time.format("%M").to_string()),
+                None => None,
+            },
+            hour_checkout: match checkout {
+                Some(time) => Some(time.format("%H").to_string()),
+                None => None,
+            },
+            minute_checkout: match checkout {
+                Some(time) => Some(time.format("%M").to_string()),
+                None => None,
+            },
+            reason: reason.into(),
+            useCheckIn: checkin.is_some(),
+            useCheckOut: checkout.is_some(),
+        };
+
+        Ok(self
+            .client
+            .post(Client::build_url("attendance-request")?)
+            .bearer_auth(token)
+            .json(&json)
             .send()?
             .json()?)
     }

@@ -5,7 +5,7 @@ const PKG_NAME: &str = env!("CARGO_PKG_NAME");
 
 #[derive(Default, Serialize, Deserialize, Debug)]
 pub(super) struct Config {
-    token: String,
+    token: Option<String>,
 }
 
 impl Config {
@@ -14,14 +14,14 @@ impl Config {
     }
 
     pub(super) fn with_token(token: String) -> Config {
-        Config { token }
+        Config { token: Some(token) }
     }
 
     pub(super) fn store(&self) -> Result<(), ConfyError> {
         confy::store(PKG_NAME, self)
     }
 
-    pub(super) fn token(&self) -> &str {
+    pub fn token(&self) -> &Option<String> {
         &self.token
     }
 }
