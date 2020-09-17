@@ -1,4 +1,13 @@
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/el7cosmos/talenta/Rust?style=flat-square)
+[![Crates.io](https://img.shields.io/crates/v/talenta?style=flat-square)](https://crates.io/crates/talenta)
+![Crates.io](https://img.shields.io/crates/l/talenta?style=flat-square)
+
 ## Installation
+
+### Rust Cargo
+```sh
+cargo install talenta
+```
 
 ### macOS Homebrew
 ```sh
