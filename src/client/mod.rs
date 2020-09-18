@@ -1,8 +1,8 @@
+use anyhow::Result;
 use chrono::{NaiveDate, NaiveTime};
 use reqwest::blocking;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::error::Error;
 use url::{ParseError, Url};
 
 #[derive(Deserialize, Debug)]
@@ -57,11 +57,7 @@ pub(super) struct Client {
 }
 
 impl Client {
-    pub(super) fn login(
-        &self,
-        email: &str,
-        password: &str,
-    ) -> Result<ApiResponse<LoginData>, Box<dyn Error>> {
+    pub(super) fn login(&self, email: &str, password: &str) -> Result<ApiResponse<LoginData>> {
         let mut map = HashMap::new();
         map.insert("email", email);
         map.insert("password", password);
@@ -80,7 +76,7 @@ impl Client {
         date: NaiveDate,
         checkin: Option<NaiveTime>,
         checkout: Option<NaiveTime>,
-    ) -> Result<ApiResponse<ResponseData>, Box<dyn Error>> {
+    ) -> Result<ApiResponse<ResponseData>> {
         let json = AttendanceRequestBody {
             datepicker_request_submit: date.to_string(),
             hour_checkin: match checkin {

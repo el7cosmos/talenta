@@ -16,6 +16,7 @@ exclude = [
 
 [dependencies]
 ansi_term = "0.12"
+anyhow = "1.0"
 chrono = "0.4"
 confy = "0.4"
 dialoguer = "0.6"

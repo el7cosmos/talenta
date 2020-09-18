@@ -1,10 +1,10 @@
 use super::Command;
 use crate::client::Client;
 use crate::config::Config;
+use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::{Input, Password};
 use reqwest::StatusCode;
-use structopt::clap::{Error, ErrorKind};
 use structopt::StructOpt;
 
 #[derive(Default, StructOpt)]
@@ -21,7 +21,7 @@ pub(crate) struct Login {
 }
 
 impl Command for Login {
-    fn run(&self) {
+    fn run(&self) -> Result<String> {
         let email = match &self.email {
             Some(email) => email.to_string(),
             None => Input::with_theme(&self.theme)
@@ -37,25 +37,17 @@ impl Command for Login {
                 .unwrap(),
         };
 
-        match self.client.login(&email, &password) {
-            Ok(login) => {
-                let status = StatusCode::from_u16(login.status()).unwrap();
-                match status.is_success() {
-                    true => {
-                        Config::with_token(login.data().as_ref().unwrap().token().into())
-                            .store()
-                            .unwrap();
+        let login = self.client.login(&email, &password)?;
+        let status = StatusCode::from_u16(login.status())?;
+        match status.is_success() {
+            true => {
+                Config::with_token(login.data().as_ref().unwrap().token().into())
+                    .store()
+                    .unwrap();
 
-                        Login::success(&login.message())
-                    }
-                    false => {
-                        Error::with_description(&login.message(), ErrorKind::ValueValidation).exit()
-                    }
-                }
+                Ok(login.message().to_string())
             }
-            Err(err) => {
-                Error::with_description(&err.to_string(), ErrorKind::ValueValidation).exit()
-            }
+            false => Err(anyhow::anyhow!("{}", login.message())),
         }
     }
 }

@@ -9,10 +9,10 @@ use crate::config::Config;
 use crate::date::Date;
 use crate::time::Time;
 use ansi_term::Colour;
+use anyhow::{anyhow, Result};
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Input;
 use reqwest::StatusCode;
-use structopt::clap::{Error, ErrorKind};
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
@@ -48,18 +48,16 @@ pub(crate) struct Attendance {
 }
 
 impl Command for Attendance {
-    fn run(&self) {
+    fn run(&self) -> Result<String> {
         let config = Config::load().unwrap();
         let token = match config.token() {
-            None => Error::with_description(
-                &format!(
+            Some(token) => token,
+            None => {
+                return Err(anyhow!(
                     "Not logged in yet. Try: {}",
                     Colour::Blue.bold().paint("talenta login")
-                ),
-                ErrorKind::ValueValidation,
-            )
-            .exit(),
-            Some(token) => token,
+                ));
+            }
         };
 
         match self.cmd.as_ref() {
@@ -85,28 +83,18 @@ impl Command for Attendance {
                         .unwrap()
                 });
 
-                match self.client.attendance_request(
+                let response = self.client.attendance_request(
                     token,
                     &reason,
                     self.date.into(),
                     checkin_time.into(),
                     checkout_time.into(),
-                ) {
-                    Ok(response) => {
-                        let status = StatusCode::from_u16(response.status()).unwrap();
-                        match status.is_success() {
-                            true => Attendance::success(response.message()),
-                            false => Error::with_description(
-                                &response.message(),
-                                ErrorKind::ValueValidation,
-                            )
-                            .exit(),
-                        }
-                    }
-                    Err(err) => {
-                        Error::with_description(&err.to_string(), ErrorKind::ValueValidation).exit()
-                    }
-                };
+                )?;
+                let status = StatusCode::from_u16(response.status())?;
+                match status.is_success() {
+                    true => Ok(response.message().to_string()),
+                    false => Err(anyhow!("{}", response.message())),
+                }
             }
             Some(cmd) => match cmd {
                 AttendanceCommand::Checkin(_checkin) => unimplemented!(),
