@@ -1,11 +1,12 @@
 use assert_cmd::prelude::*;
 use predicates::prelude::*;
+use std::error::Error;
 use std::process::Command;
 
 const PKG_NAME: &str = env!("CARGO_PKG_NAME");
 
 #[test]
-fn version() -> Result<(), Box<dyn std::error::Error>> {
+fn version() -> Result<(), Box<dyn Error>> {
     let mut cmd = Command::cargo_bin(PKG_NAME).unwrap();
 
     let assert = cmd.arg("--version").assert();
@@ -18,19 +19,28 @@ fn version() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 #[test]
-fn login() -> Result<(), Box<dyn std::error::Error>> {
+fn help() -> Result<(), Box<dyn Error>> {
     let mut cmd = Command::cargo_bin(PKG_NAME).unwrap();
 
-    let assert = cmd
-        .arg("login")
-        .arg("--email")
-        .arg("admin@example.com")
-        .arg("--password")
-        .arg("password")
-        .assert();
-    assert
-        .code(predicate::ne(0))
-        .stderr(predicate::str::contains("error: Wrong Email or Password"));
+    cmd.arg("--help").assert().code(0);
+
+    Ok(())
+}
+
+#[test]
+fn login() -> Result<(), Box<dyn Error>> {
+    let mut cmd = Command::cargo_bin(PKG_NAME).unwrap();
+
+    cmd.arg("login").arg("--help").assert().code(0);
+
+    Ok(())
+}
+
+#[test]
+fn attendance() -> Result<(), Box<dyn Error>> {
+    let mut cmd = Command::cargo_bin(PKG_NAME).unwrap();
+
+    cmd.arg("attendance").arg("--help").assert().code(0);
 
     Ok(())
 }
