@@ -22,18 +22,20 @@ pub(crate) struct Login {
 
 impl Command for Login {
     fn run(&self) {
-        let email = self.email.clone().unwrap_or_else(|| {
-            Input::with_theme(&self.theme)
+        let email = match &self.email {
+            Some(email) => email.to_string(),
+            None => Input::with_theme(&self.theme)
                 .with_prompt("email")
                 .interact()
-                .unwrap()
-        });
-        let password = self.password.clone().unwrap_or_else(|| {
-            Password::with_theme(&self.theme)
+                .unwrap(),
+        };
+        let password = match &self.password {
+            Some(password) => password.to_string(),
+            None => Password::with_theme(&self.theme)
                 .with_prompt("password")
                 .interact()
-                .unwrap()
-        });
+                .unwrap(),
+        };
 
         match self.client.login(&email, &password) {
             Ok(login) => {
