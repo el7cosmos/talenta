@@ -7,6 +7,10 @@
 - [Usage](#usage)
     - [Login](#login)
     - [Request attendance](#request-attendance)
+        - [Independent checkin/checkout](#independent-checkincheckout)
+    - [Live attendance](#live-attendance)
+- [License](#license)
+- [Contribution](#contribution)
 ---
 
 ## Installation
@@ -49,6 +53,14 @@ talenta attendance --date <DATE> --checkin-time <TIME> --checkout-time <TIME> --
 
 - `DATE`: ISO 8601 date format (`YYYY-mm-dd`)
 - `TIME`: Time in format `HH:MM`
+
+#### Independent checkin/checkout
+
+> Planned in **0.3.x**
+
+### Live attendance
+
+> Planned in **0.4.x**
 
 ## License
 
