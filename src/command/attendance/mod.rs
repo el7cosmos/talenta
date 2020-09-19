@@ -48,17 +48,13 @@ pub(crate) struct Attendance {
 }
 
 impl Command for Attendance {
-    fn run(&self) -> Result<String> {
-        let config = Config::load().unwrap();
-        let token = match config.token() {
-            Some(token) => token,
-            None => {
-                return Err(anyhow!(
-                    "Not logged in yet. Try: {}",
-                    Colour::Blue.bold().paint("talenta login")
-                ));
-            }
-        };
+    fn run(&mut self) -> Result<String> {
+        let config = Config::load()?;
+        let token = config.token().ok_or(anyhow!(
+            "Not logged in yet. Try {}",
+            Colour::Blue.bold().paint("talenta login")
+        ))?;
+        self.client.set_token(&token);
 
         match self.cmd.as_ref() {
             None => {
@@ -76,15 +72,14 @@ impl Command for Attendance {
                         .unwrap()
                 });
 
-                let reason = self.reason.clone().unwrap_or_else(|| {
-                    Input::with_theme(&self.theme)
+                let reason = match &self.reason {
+                    Some(reason) => reason.to_string(),
+                    None => Input::with_theme(&self.theme)
                         .with_prompt("Reason")
-                        .interact()
-                        .unwrap()
-                });
+                        .interact()?,
+                };
 
                 let response = self.client.attendance_request(
-                    token,
                     &reason,
                     self.date.into(),
                     checkin_time.into(),

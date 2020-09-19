@@ -21,33 +21,27 @@ pub(crate) struct Login {
 }
 
 impl Command for Login {
-    fn run(&self) -> Result<String> {
+    fn run(&mut self) -> Result<String> {
         let email = match &self.email {
             Some(email) => email.to_string(),
             None => Input::with_theme(&self.theme)
                 .with_prompt("email")
-                .interact()
-                .unwrap(),
+                .interact()?,
         };
         let password = match &self.password {
             Some(password) => password.to_string(),
             None => Password::with_theme(&self.theme)
                 .with_prompt("password")
-                .interact()
-                .unwrap(),
+                .interact()?,
         };
 
         let login = self.client.login(&email, &password)?;
         let status = StatusCode::from_u16(login.status())?;
-        match status.is_success() {
-            true => {
-                Config::with_token(login.data().as_ref().unwrap().token().into())
-                    .store()
-                    .unwrap();
 
-                Ok(login.message().to_string())
-            }
-            false => Err(anyhow::anyhow!("{}", login.message())),
+        if status.is_success() {
+            Config::with_token(login.data().as_ref().unwrap().token().into()).store()?;
+            return Ok(login.message().to_string());
         }
+        Err(anyhow::anyhow!("{}", login.message()))
     }
 }

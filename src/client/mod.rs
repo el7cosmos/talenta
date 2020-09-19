@@ -54,6 +54,7 @@ struct AttendanceRequestBody {
 #[derive(Default, Debug)]
 pub(super) struct Client {
     client: blocking::Client,
+    token: Option<String>,
 }
 
 impl Client {
@@ -71,7 +72,6 @@ impl Client {
 
     pub(super) fn attendance_request(
         &self,
-        token: &str,
         reason: &str,
         date: NaiveDate,
         checkin: Option<NaiveTime>,
@@ -100,13 +100,22 @@ impl Client {
             useCheckOut: checkout.is_some(),
         };
 
-        Ok(self
+        let response = self
             .client
             .post(Client::build_url("attendance-request")?)
-            .bearer_auth(token)
+            .bearer_auth(
+                self.token
+                    .as_deref()
+                    .ok_or(anyhow::anyhow!("Not logged in yet"))?,
+            )
             .json(&json)
-            .send()?
-            .json()?)
+            .send()?;
+
+        Ok(response.json()?)
+    }
+
+    pub(super) fn set_token(&mut self, token: &str) {
+        self.token = Some(token.into());
     }
 
     fn build_url(path: &str) -> Result<Url, ParseError> {

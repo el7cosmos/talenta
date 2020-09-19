@@ -19,7 +19,7 @@ struct App {
 }
 
 fn main() {
-    let app: App = App::from_args();
+    let mut app: App = App::from_args();
 
     match app.cmd.run() {
         Ok(message) => {
