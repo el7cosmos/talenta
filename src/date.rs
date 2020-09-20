@@ -7,7 +7,7 @@ pub(super) struct Date(NaiveDate);
 impl Default for Date {
     fn default() -> Self {
         Date {
-            0: Local::now().date().naive_local(),
+            0: Local::today().naive_local(),
         }
     }
 }
@@ -42,6 +42,6 @@ mod tests {
 
     #[test]
     fn default() {
-        assert_eq!(Date::default().0, Local::now().date().naive_local())
+        assert_eq!(Date::default().0, Local::today().naive_local())
     }
 }

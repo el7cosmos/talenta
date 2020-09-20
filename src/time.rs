@@ -1,4 +1,4 @@
-use chrono::{Local, NaiveTime, ParseError, ParseResult};
+use chrono::{Local, NaiveTime, ParseError, ParseResult, Timelike};
 
 #[derive(Copy, Clone, Debug)]
 pub(super) struct Time(NaiveTime);
@@ -6,7 +6,7 @@ pub(super) struct Time(NaiveTime);
 impl Default for Time {
     fn default() -> Self {
         Time {
-            0: Local::now().time(),
+            0: Local::now().with_nanosecond(0).unwrap().time(),
         }
     }
 }
@@ -21,13 +21,10 @@ impl std::str::FromStr for Time {
     type Err = ParseError;
 
     fn from_str(s: &str) -> ParseResult<Time> {
-        match NaiveTime::parse_from_str(s, "%R") {
-            Ok(naive) => Ok(Time { 0: naive }),
-            Err(_) => match NaiveTime::from_str(s) {
-                Ok(naive) => Ok(Time { 0: naive }),
-                Err(err) => Err(err),
-            },
-        }
+        NaiveTime::parse_from_str(s, "%R")
+            .or(NaiveTime::parse_from_str(s, "%T"))
+            .or(NaiveTime::from_str(s))
+            .map(|f| Time { 0: f })
     }
 }
 
@@ -51,8 +48,8 @@ mod tests {
     #[test]
     fn default() {
         assert_eq!(
-            Time::default().0.with_nanosecond(0),
-            Local::now().time().with_nanosecond(0)
+            Time::default().0,
+            Local::now().with_nanosecond(0).unwrap().time()
         )
     }
 }
