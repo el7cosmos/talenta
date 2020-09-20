@@ -1,14 +1,22 @@
 mod attendance;
 mod login;
 
+use crate::client::Client;
 use crate::command::attendance::Attendance;
 use crate::command::login::Login;
 use anyhow::Result;
+use dialoguer::theme::ColorfulTheme;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
 
+#[derive(Default, StructOpt)]
+pub(super) struct RootOpts {
+    #[structopt(skip)]
+    theme: ColorfulTheme,
+}
+
 pub(super) trait Command {
-    fn run(&mut self) -> Result<String>;
+    fn run(self, client: Client) -> Result<String>;
 }
 
 #[derive(StructOpt)]
@@ -19,10 +27,10 @@ pub(super) enum RootCommand {
 }
 
 impl Command for RootCommand {
-    fn run(&mut self) -> Result<String> {
+    fn run(self, client: Client) -> Result<String> {
         match self {
-            Self::Login(login) => login.run(),
-            Self::Attendance(attendance) => attendance.run(),
+            Self::Login(login) => login.run(client),
+            Self::Attendance(attendance) => attendance.run(client),
         }
     }
 }

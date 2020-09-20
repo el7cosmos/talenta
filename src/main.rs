@@ -11,7 +11,9 @@ mod date;
 mod time;
 
 fn main() {
-    match RootCommand::from_args().run() {
+    let client = client::Client::default();
+
+    match RootCommand::from_args().run(client) {
         Ok(message) => {
             let out = io::stdout();
             writeln!(

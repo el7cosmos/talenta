@@ -1,18 +1,16 @@
 use super::Command;
 use crate::client::Client;
+use crate::command::RootOpts;
 use crate::config::Config;
 use anyhow::Result;
-use dialoguer::theme::ColorfulTheme;
 use dialoguer::{Input, Password};
 use reqwest::StatusCode;
 use structopt::StructOpt;
 
 #[derive(Default, StructOpt)]
 pub(crate) struct Login {
-    #[structopt(skip)]
-    client: Client,
-    #[structopt(skip)]
-    theme: ColorfulTheme,
+    #[structopt(flatten)]
+    opts: RootOpts,
 
     #[structopt(long, value_name = "EMAIL")]
     email: Option<String>,
@@ -21,21 +19,24 @@ pub(crate) struct Login {
 }
 
 impl Command for Login {
-    fn run(&mut self) -> Result<String> {
-        let email = match &self.email {
-            Some(email) => email.to_string(),
-            None => Input::with_theme(&self.theme)
-                .with_prompt("email")
-                .interact()?,
-        };
-        let password = match &self.password {
-            Some(password) => password.to_string(),
-            None => Password::with_theme(&self.theme)
-                .with_prompt("password")
-                .interact()?,
-        };
+    fn run(self, client: Client) -> Result<String> {
+        let theme = self.opts.theme;
 
-        let login = self.client.login(&email, &password)?;
+        let email = self.email.unwrap_or_else(|| {
+            Input::with_theme(&theme)
+                .with_prompt("email")
+                .interact()
+                .unwrap()
+        });
+
+        let password = self.password.unwrap_or_else(|| {
+            Password::with_theme(&theme)
+                .with_prompt("password")
+                .interact()
+                .unwrap()
+        });
+
+        let login = client.login(&email, &password)?;
         let status = StatusCode::from_u16(login.status())?;
 
         if status.is_success() {
