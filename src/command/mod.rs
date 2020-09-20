@@ -4,6 +4,7 @@ mod login;
 use crate::command::attendance::Attendance;
 use crate::command::login::Login;
 use anyhow::Result;
+use structopt::clap::AppSettings;
 use structopt::StructOpt;
 
 pub(super) trait Command {
@@ -11,6 +12,7 @@ pub(super) trait Command {
 }
 
 #[derive(StructOpt)]
+#[structopt(global_settings(& [AppSettings::ColoredHelp, AppSettings::DeriveDisplayOrder, AppSettings::VersionlessSubcommands]))]
 pub(super) enum RootCommand {
     Login(Login),
     Attendance(Attendance),

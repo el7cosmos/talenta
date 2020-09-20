@@ -2,7 +2,6 @@ use crate::command::{Command, RootCommand};
 use ansi_term::Colour;
 use std::io::{self, Write};
 use std::process;
-use structopt::clap::AppSettings;
 use structopt::StructOpt;
 
 mod client;
@@ -11,17 +10,8 @@ mod config;
 mod date;
 mod time;
 
-#[derive(StructOpt)]
-#[structopt(global_settings(& [AppSettings::ColoredHelp, AppSettings::DeriveDisplayOrder, AppSettings::VersionlessSubcommands]))]
-struct App {
-    #[structopt(subcommand)]
-    cmd: RootCommand,
-}
-
 fn main() {
-    let mut app: App = App::from_args();
-
-    match app.cmd.run() {
+    match RootCommand::from_args().run() {
         Ok(message) => {
             let out = io::stdout();
             writeln!(
