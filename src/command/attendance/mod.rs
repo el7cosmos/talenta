@@ -96,8 +96,8 @@ impl Command for Attendance {
         match self.cmd {
             None => self.execute(client),
             Some(cmd) => match cmd {
-                AttendanceCommand::Checkin(_checkin) => unimplemented!(),
-                AttendanceCommand::Checkout(_checkout) => unimplemented!(),
+                AttendanceCommand::Checkin(checkin) => checkin.run(client),
+                AttendanceCommand::Checkout(checkout) => checkout.run(client),
             },
         }
     }

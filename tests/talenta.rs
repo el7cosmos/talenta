@@ -44,3 +44,29 @@ fn attendance() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+#[test]
+fn attendance_checkin() -> Result<(), Box<dyn Error>> {
+    let mut cmd = Command::cargo_bin(PKG_NAME).unwrap();
+
+    cmd.arg("attendance")
+        .arg("checkin")
+        .arg("--help")
+        .assert()
+        .code(0);
+
+    Ok(())
+}
+
+#[test]
+fn attendance_checkout() -> Result<(), Box<dyn Error>> {
+    let mut cmd = Command::cargo_bin(PKG_NAME).unwrap();
+
+    cmd.arg("attendance")
+        .arg("checkout")
+        .arg("--help")
+        .assert()
+        .code(0);
+
+    Ok(())
+}
