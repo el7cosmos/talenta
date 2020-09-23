@@ -1,4 +1,5 @@
 use crate::command::{Command, RootCommand};
+use crate::config::Config;
 use ansi_term::Colour;
 use std::io::{self, Write};
 use std::process;
@@ -11,9 +12,13 @@ mod date;
 mod time;
 
 fn main() {
-    let client = client::Client::default();
+    let mut client = client::Client::default();
+    let config = Config::load().unwrap();
+    if let Some(token) = config.token() {
+        client.set_token(token)
+    }
 
-    match RootCommand::from_args().run(client) {
+    match RootCommand::from_args().run(&client) {
         Ok(message) => {
             let out = io::stdout();
             writeln!(

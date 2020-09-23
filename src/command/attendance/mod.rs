@@ -6,7 +6,6 @@ use super::attendance::checkout::Checkout;
 use super::Command;
 use crate::client::Client;
 use crate::command::RootOpts;
-use crate::config::Config;
 use crate::date::Date;
 use crate::time::Time;
 use ansi_term::Colour;
@@ -46,7 +45,7 @@ pub(crate) struct Attendance {
 }
 
 impl Attendance {
-    fn execute(self, client: Client) -> Result<String> {
+    fn execute(self, client: &Client) -> Result<String> {
         let theme = self.opts.theme;
 
         let checkin_time = self.checkin_time.unwrap_or_else(|| {
@@ -85,13 +84,13 @@ impl Attendance {
 }
 
 impl Command for Attendance {
-    fn run(self, mut client: Client) -> Result<String> {
-        let config = Config::load()?;
-        let token = config.token().ok_or(anyhow!(
-            "Not logged in yet. Try {}",
-            Colour::Blue.bold().paint("talenta login")
-        ))?;
-        client.set_token(&token);
+    fn run(self, client: &Client) -> Result<String> {
+        if client.token().is_none() {
+            return Err(anyhow!(
+                "Not logged in yet. Try {}",
+                Colour::Blue.bold().paint("talenta login")
+            ));
+        }
 
         match self.cmd {
             None => self.execute(client),

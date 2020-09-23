@@ -33,7 +33,7 @@ pub(super) struct Checkout {
 }
 
 impl Command for Checkout {
-    fn run(self, client: Client) -> anyhow::Result<String> {
+    fn run(self, client: &Client) -> anyhow::Result<String> {
         let theme = self.opts.theme;
 
         let reason = self.reason.unwrap_or_else(|| {

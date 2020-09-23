@@ -114,6 +114,10 @@ impl Client {
         Ok(response.json()?)
     }
 
+    pub(super) fn token(&self) -> &Option<String> {
+        &self.token
+    }
+
     pub(super) fn set_token(&mut self, token: &str) {
         self.token = Some(token.into());
     }

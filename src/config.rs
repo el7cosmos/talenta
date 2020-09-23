@@ -21,7 +21,7 @@ impl Config {
         confy::store(PKG_NAME, self)
     }
 
-    pub(super) fn token(self) -> Option<String> {
-        self.token
+    pub fn token(&self) -> &Option<String> {
+        &self.token
     }
 }

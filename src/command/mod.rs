@@ -16,7 +16,7 @@ pub(super) struct RootOpts {
 }
 
 pub(super) trait Command {
-    fn run(self, client: Client) -> Result<String>;
+    fn run(self, client: &Client) -> Result<String>;
 }
 
 #[derive(StructOpt)]
@@ -27,7 +27,7 @@ pub(super) enum RootCommand {
 }
 
 impl Command for RootCommand {
-    fn run(self, client: Client) -> Result<String> {
+    fn run(self, client: &Client) -> Result<String> {
         match self {
             Self::Login(login) => login.run(client),
             Self::Attendance(attendance) => attendance.run(client),

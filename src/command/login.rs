@@ -19,7 +19,7 @@ pub(crate) struct Login {
 }
 
 impl Command for Login {
-    fn run(self, client: Client) -> Result<String> {
+    fn run(self, client: &Client) -> Result<String> {
         let theme = self.opts.theme;
 
         let email = self.email.unwrap_or_else(|| {
