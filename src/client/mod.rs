@@ -1,9 +1,9 @@
 use anyhow::Result;
 use chrono::{NaiveDate, NaiveTime};
 use reqwest::blocking;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use url::{ParseError, Url};
 
 #[derive(Deserialize, Debug)]
 pub(super) struct ApiResponse<T> {
@@ -122,10 +122,11 @@ impl Client {
         self.token = Some(token.into());
     }
 
-    fn build_url(path: &str) -> Result<Url, ParseError> {
+    fn build_url(path: &str) -> anyhow::Result<Url> {
         const BASE_URL: &str = "https://api-mobile.talenta.co/api/v1/";
-        let base = Url::parse(BASE_URL).expect("hardcoded URL is known to be valid");
-        let url = base.join(path)?;
+        let url = Url::parse(BASE_URL)
+            .expect("hardcoded URL is known to be valid")
+            .join(path)?;
 
         Ok(url)
     }

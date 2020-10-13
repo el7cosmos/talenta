@@ -23,7 +23,6 @@ dialoguer = "0.6"
 reqwest = { version = "0.10", features = ["blocking", "json"] }
 serde = { version = "1.0", features = ["derive"] }
 structopt = "0.3"
-url = "2.1"
 
 [dev-dependencies]
 assert_cmd = "1.0"

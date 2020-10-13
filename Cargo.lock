@@ -1148,7 +1148,6 @@ dependencies = [
  "reqwest",
  "serde",
  "structopt",
- "url",
 ]
 
 [[package]]
