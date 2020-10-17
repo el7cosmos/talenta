@@ -16,19 +16,20 @@
 ## Installation
 
 ### Rust Cargo
-```sh
+```shell script
 cargo install talenta
 ```
 
 ### macOS Homebrew
-```sh
-brew install el7cosmos/brew/talenta
+```shell script
+brew tap el7cosmos/brew
+brew install talenta
 ```
 
 ## Usage
 
 ### Login
-```sh
+```shell script
 # Interactive
 talenta login
 
@@ -37,7 +38,7 @@ talenta login --email <EMAIL> --password <PASSWORD>
 ```
 
 ### Request attendance
-```sh
+```shell script
 # Interactive, use current date
 talenta attendance
 
@@ -51,12 +52,27 @@ talenta attendance --checkin-time <TIME> --checkout-time <TIME> --reason <reason
 talenta attendance --date <DATE> --checkin-time <TIME> --checkout-time <TIME> --reason <reason>
 ```
 
+#### Independent checkin/checkout
+```shell script
+# Interactive, use current date and time
+talenta attendance checkin
+talenta attendance checkout
+
+# Interactive, change attendance date and time
+talenta attendance checkin --date <DATE> --time <TIME>
+talenta attendance checkout --date <DATE> --time <TIME>
+
+# Non-interactive, use current date and time
+talenta attendance checkin --reason <reason>
+talenta attendance checkout --reason <reason>
+
+# Non-interactive, change attendance date and time
+talenta attendance checkin --reason <reason> --date <DATE> --time <TIME>
+talenta attendance checkout --reason <reason> --date <DATE> --time <TIME>
+```
+
 - `DATE`: ISO 8601 date format (`YYYY-mm-dd`)
 - `TIME`: Time in format `HH:MM`
-
-#### Independent checkin/checkout
-
-> Planned in **0.3.x**
 
 ### Live attendance
 
