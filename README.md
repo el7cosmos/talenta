@@ -46,10 +46,10 @@ talenta attendance
 talenta attendance --date <DATE>
 
 # Non-interactive, use current date
-talenta attendance --checkin-time <TIME> --checkout-time <TIME> --reason <reason>
+talenta attendance --checkin-time <TIME> --checkout-time <TIME> --description <description>
 
 # Non-interactive, change attendance date
-talenta attendance --date <DATE> --checkin-time <TIME> --checkout-time <TIME> --reason <reason>
+talenta attendance --date <DATE> --checkin-time <TIME> --checkout-time <TIME> --description <description>
 ```
 
 #### Independent checkin/checkout
@@ -63,12 +63,12 @@ talenta attendance checkin --date <DATE> --time <TIME>
 talenta attendance checkout --date <DATE> --time <TIME>
 
 # Non-interactive, use current date and time
-talenta attendance checkin --reason <reason>
-talenta attendance checkout --reason <reason>
+talenta attendance checkin --description <description>
+talenta attendance checkout --description <description>
 
 # Non-interactive, change attendance date and time
-talenta attendance checkin --reason <reason> --date <DATE> --time <TIME>
-talenta attendance checkout --reason <reason> --date <DATE> --time <TIME>
+talenta attendance checkin --description <description> --date <DATE> --time <TIME>
+talenta attendance checkout --description <description> --date <DATE> --time <TIME>
 ```
 
 - `DATE`: ISO 8601 date format (`YYYY-mm-dd`)

@@ -12,10 +12,9 @@ pub(super) struct Checkout {
     #[structopt(flatten)]
     opts: RootOpts,
 
-    #[structopt(short, long)]
+    #[structopt(name = "description", short, long, visible_aliases = & ["notes", "reason"])]
     reason: Option<String>,
     #[structopt(
-        short,
         long,
         default_value,
         help = "Effective date (YYYY-mm-dd)",
@@ -23,7 +22,6 @@ pub(super) struct Checkout {
     )]
     date: Date,
     #[structopt(
-        short,
         long,
         default_value,
         help = "Checkout time (HH:MM)",
@@ -38,7 +36,7 @@ impl Command for Checkout {
 
         let reason = self.reason.unwrap_or_else(|| {
             Input::with_theme(&theme)
-                .with_prompt("Reason")
+                .with_prompt("Description")
                 .interact()
                 .unwrap()
         });

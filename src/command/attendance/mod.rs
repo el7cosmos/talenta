@@ -26,7 +26,7 @@ pub(crate) struct Attendance {
     #[structopt(flatten)]
     opts: RootOpts,
 
-    #[structopt(long)]
+    #[structopt(name = "description", short, long, visible_aliases = & ["notes", "reason"])]
     reason: Option<String>,
     #[structopt(
         default_value,
@@ -64,7 +64,7 @@ impl Attendance {
 
         let reason = self.reason.unwrap_or_else(|| {
             Input::with_theme(&theme)
-                .with_prompt("Reason")
+                .with_prompt("Description")
                 .interact()
                 .unwrap()
         });
