@@ -51,6 +51,14 @@ struct AttendanceRequestBody {
     useCheckOut: bool,
 }
 
+#[derive(Serialize, Debug)]
+struct LiveAttendanceRequestBody {
+    status: String,
+    latitude: f64,
+    longitude: f64,
+    description: Option<String>,
+}
+
 #[derive(Default, Debug)]
 pub(super) struct Client {
     client: blocking::Client,
@@ -112,6 +120,33 @@ impl Client {
             .send()?;
 
         Ok(response.json()?)
+    }
+
+    pub(super) fn live_attendance(
+        &self,
+        status: &str,
+        latitude: f64,
+        longitude: f64,
+        description: Option<String>,
+    ) -> Result<ApiResponse<ResponseData>> {
+        let form = LiveAttendanceRequestBody {
+            status: status.to_string(),
+            latitude,
+            longitude,
+            description,
+        };
+
+        Ok(self
+            .client
+            .post(Client::build_url("live-attendance")?)
+            .bearer_auth(
+                self.token
+                    .as_deref()
+                    .ok_or(anyhow::anyhow!("Not logged in yet"))?,
+            )
+            .form(&form)
+            .send()?
+            .json()?)
     }
 
     pub(super) fn token(&self) -> &Option<String> {

@@ -1,6 +1,6 @@
 [package]
 name = "talenta"
-version = "0.3.2"
+version = "0.4.0"
 authors = ["el7cosmos <el@elabee.me>"]
 edition = "2018"
 description = "Talenta CLI"

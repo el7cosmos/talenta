@@ -1,8 +1,10 @@
 mod attendance;
+mod live;
 mod login;
 
 use crate::client::Client;
 use crate::command::attendance::Attendance;
+use crate::command::live::Live;
 use crate::command::login::Login;
 use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
@@ -13,6 +15,9 @@ use structopt::StructOpt;
 pub(super) struct RootOpts {
     #[structopt(skip)]
     theme: ColorfulTheme,
+
+    #[structopt(short = "n", long = "no-interaction", parse(from_flag = std::ops::Not::not))]
+    interactive: bool,
 }
 
 pub(super) trait Command {
@@ -24,6 +29,7 @@ pub(super) trait Command {
 pub(super) enum RootCommand {
     Login(Login),
     Attendance(Attendance),
+    Live(Live),
 }
 
 impl Command for RootCommand {
@@ -31,6 +37,7 @@ impl Command for RootCommand {
         match self {
             Self::Login(login) => login.run(client),
             Self::Attendance(attendance) => attendance.run(client),
+            Self::Live(live) => live.run(client),
         }
     }
 }

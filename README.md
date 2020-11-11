@@ -76,7 +76,15 @@ talenta attendance checkout --description <description> --date <DATE> --time <TI
 
 ### Live attendance
 
-> Planned in **0.4.x**
+```shell script
+# Interactive
+talenta live checkin
+talenta live checkout
+
+# Non-interactive
+talenta live checkin --latitude <FLOAT> --longitude <FLOAT> --no-interaction
+talenta live checkout --latitude <FLOAT> --longitude <FLOAT> --no-interaction
+```
 
 ## License
 
