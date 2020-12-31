@@ -27,22 +27,22 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - name: Add a target to a Rust toolchain
-      run: rustup target add ${{ matrix.target }}
-    - if: matrix.os == 'macos-latest'
-      run: |
-        brew install gnu-tar
-        echo "::add-path::/usr/local/opt/gnu-tar/libexec/gnubin"
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-        restore-keys: ${{ matrix.target }}-cargo-
-    - name: Build
-      run: cargo build --target ${{ matrix.target }}
-    - name: Run tests
-      run: cargo test --target ${{ matrix.target }}
+      - name: Add a target to a Rust toolchain
+        run: rustup target add ${{ matrix.target }}
+      - if: matrix.os == 'macos-latest'
+        run: |
+          brew install gnu-tar
+          echo "/usr/local/opt/gnu-tar/libexec/gnubin" >> $GITHUB_PATH
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ matrix.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ matrix.target }}-cargo-
+      - name: Build
+        run: cargo build --target ${{ matrix.target }}
+      - name: Run tests
+        run: cargo test --target ${{ matrix.target }}
