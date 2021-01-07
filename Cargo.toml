@@ -19,7 +19,7 @@ ansi_term = "0.12"
 anyhow = "1.0"
 chrono = "0.4"
 confy = "0.4"
-dialoguer = "0.6"
+dialoguer = "0.7"
 reqwest = { version = "0.10", features = ["blocking", "json"] }
 serde = { version = "1.0", features = ["derive"] }
 structopt = "0.3"
