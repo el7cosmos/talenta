@@ -212,3 +212,21 @@ impl Client {
         Ok(url)
     }
 }
+
+pub(crate) fn is_holiday(date: NaiveDate, client: &Client) -> Result<bool> {
+    let calendar = client.calendar(date.year(), date.month(), date.day(), date.day())?;
+    if calendar.status == 200 {
+        match calendar.data {
+            None => return Ok(false),
+            Some(data) => {
+                for event in data.events {
+                    if let CalendarEventType::N = event.event_type {
+                        return Ok(true);
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(false)
+}
