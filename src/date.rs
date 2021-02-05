@@ -1,5 +1,5 @@
 use chrono::{Local, NaiveDate, ParseError, ParseResult};
-use serde::export::Formatter;
+use std::fmt::Formatter;
 
 #[derive(Copy, Clone, Debug)]
 pub(super) struct Date(NaiveDate);
