@@ -1,5 +1,7 @@
 use anyhow::Result;
-use chrono::{NaiveDate, NaiveTime};
+use chrono::Datelike;
+use chrono::NaiveDate;
+use chrono::NaiveTime;
 use reqwest::blocking;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
@@ -36,6 +38,27 @@ impl LoginData {
     pub(super) fn token(&self) -> &str {
         &self.token
     }
+}
+
+#[derive(Deserialize, Debug)]
+enum CalendarEventType {
+    B,
+    N,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Debug)]
+struct CalendarEvent {
+    #[serde(rename = "type")]
+    event_type: CalendarEventType,
+    start: NaiveDate,
+    title: String,
+}
+
+#[allow(non_snake_case)]
+#[derive(Deserialize, Debug)]
+struct CalendarData {
+    events: Vec<CalendarEvent>,
 }
 
 #[allow(non_snake_case)]
@@ -147,6 +170,29 @@ impl Client {
             .form(&form)
             .send()?
             .json()?)
+    }
+
+    fn calendar(
+        &self,
+        year: i32,
+        month: u32,
+        start_date: u32,
+        end_date: u32,
+    ) -> Result<ApiResponse<CalendarData>> {
+        let start_date = NaiveDate::from_ymd(year, month, start_date);
+        let end_date = NaiveDate::from_ymd(year, month, end_date);
+
+        let mut url = Client::build_url("calendar")?;
+        url.query_pairs_mut().extend_pairs(&[
+            ("startDate", start_date.to_string()),
+            ("endDate", end_date.to_string()),
+            ("month", month.to_string()),
+        ]);
+
+        match &self.token {
+            None => Err(anyhow::anyhow!("Not logged in yet")),
+            Some(token) => Ok(self.client.get(url).bearer_auth(token).send()?.json()?),
+        }
     }
 
     pub(super) fn token(&self) -> &Option<String> {
