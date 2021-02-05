@@ -4,8 +4,8 @@ mod checkout;
 use super::attendance::checkin::Checkin;
 use super::attendance::checkout::Checkout;
 use super::Command;
+use super::RootOpts;
 use crate::client::Client;
-use crate::command::RootOpts;
 use crate::date::Date;
 use crate::time::Time;
 use ansi_term::Colour;
@@ -93,7 +93,10 @@ impl Command for Attendance {
         }
 
         match self.cmd {
-            None => self.execute(client),
+            None => {
+                super::holiday::check_holiday(self.date.into(), client)?;
+                self.execute(client)
+            }
             Some(cmd) => match cmd {
                 AttendanceCommand::Checkin(checkin) => checkin.run(client),
                 AttendanceCommand::Checkout(checkout) => checkout.run(client),

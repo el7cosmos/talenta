@@ -1,5 +1,6 @@
 use crate::client::Client;
 use crate::command::{Command, RootOpts};
+use chrono::Local;
 use dialoguer::{Confirm, Input};
 use reqwest::StatusCode;
 use structopt::StructOpt;
@@ -24,6 +25,8 @@ pub(crate) struct Live {
 
 impl Command for Live {
     fn run(self, client: &Client) -> anyhow::Result<String> {
+        super::holiday::check_holiday(Local::today().naive_local(), client)?;
+
         let theme = self.opts.theme;
 
         let (lat, lng) = match self.latitude.is_none() || self.longitude.is_none() {
