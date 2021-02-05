@@ -22,8 +22,8 @@ impl std::str::FromStr for Time {
 
     fn from_str(s: &str) -> ParseResult<Time> {
         NaiveTime::parse_from_str(s, "%R")
-            .or(NaiveTime::parse_from_str(s, "%T"))
-            .or(NaiveTime::from_str(s))
+            .or_else(|_| NaiveTime::parse_from_str(s, "%T"))
+            .or_else(|_| NaiveTime::from_str(s))
             .map(|f| Time { 0: f })
     }
 }
