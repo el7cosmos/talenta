@@ -131,18 +131,19 @@ impl Client {
             useCheckOut: checkout.is_some(),
         };
 
-        let response = self
-            .client
-            .post(Client::build_url("attendance-request")?)
-            .bearer_auth(
-                self.token
-                    .as_deref()
-                    .ok_or(anyhow::anyhow!("Not logged in yet"))?,
-            )
-            .json(&json)
-            .send()?;
+        match &self.token {
+            None => Err(anyhow::anyhow!("Not logged in yet")),
+            Some(token) => {
+                let response = self
+                    .client
+                    .post(Client::build_url("attendance-request")?)
+                    .bearer_auth(token)
+                    .json(&json)
+                    .send()?;
 
-        Ok(response.json()?)
+                Ok(response.json()?)
+            }
+        }
     }
 
     pub(super) fn live_attendance(
@@ -159,17 +160,16 @@ impl Client {
             description,
         };
 
-        Ok(self
-            .client
-            .post(Client::build_url("live-attendance")?)
-            .bearer_auth(
-                self.token
-                    .as_deref()
-                    .ok_or(anyhow::anyhow!("Not logged in yet"))?,
-            )
-            .form(&form)
-            .send()?
-            .json()?)
+        match &self.token {
+            None => Err(anyhow::anyhow!("Not logged in yet")),
+            Some(token) => Ok(self
+                .client
+                .post(Client::build_url("live-attendance")?)
+                .bearer_auth(token)
+                .form(&form)
+                .send()?
+                .json()?),
+        }
     }
 
     fn calendar(
