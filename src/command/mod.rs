@@ -29,7 +29,7 @@ pub(super) trait Command {
 #[structopt(global_settings(& [AppSettings::ColoredHelp, AppSettings::DeriveDisplayOrder, AppSettings::VersionlessSubcommands]))]
 pub(super) enum RootCommand {
     Login(Login),
-    Attendance(Attendance),
+    Attendance(Box<Attendance>),
     Live(Live),
 }
 
