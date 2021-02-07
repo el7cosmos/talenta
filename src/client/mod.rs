@@ -46,7 +46,6 @@ enum CalendarEventType {
     N,
 }
 
-#[allow(non_snake_case)]
 #[derive(Deserialize, Debug)]
 struct CalendarEvent {
     #[serde(rename = "type")]
@@ -55,7 +54,6 @@ struct CalendarEvent {
     title: String,
 }
 
-#[allow(non_snake_case)]
 #[derive(Deserialize, Debug)]
 struct CalendarData {
     events: Vec<CalendarEvent>,
