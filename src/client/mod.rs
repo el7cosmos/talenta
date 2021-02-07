@@ -82,10 +82,30 @@ struct LiveAttendanceRequestBody {
     description: Option<String>,
 }
 
-#[derive(Default, Debug)]
+#[derive(Debug)]
 pub(super) struct Client {
     client: blocking::Client,
     token: Option<String>,
+}
+
+impl Default for Client {
+    fn default() -> Self {
+        let user_agent = format!(
+            "{}/{} ({}; +{})",
+            env!("CARGO_PKG_NAME"),
+            env!("CARGO_PKG_VERSION"),
+            env!("CARGO_PKG_DESCRIPTION"),
+            env!("CARGO_PKG_HOMEPAGE"),
+        );
+
+        Self {
+            client: blocking::Client::builder()
+                .user_agent(user_agent)
+                .build()
+                .expect("Client::default()"),
+            token: None,
+        }
+    }
 }
 
 impl Client {

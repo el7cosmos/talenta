@@ -4,6 +4,7 @@ version = "0.4.3"
 authors = ["el7cosmos <el@elabee.me>"]
 edition = "2018"
 description = "Talenta CLI"
+homepage = "https://crates.io/crates/talenta"
 repository = "https://github.com/el7cosmos/talenta"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
@@ -27,3 +28,4 @@ structopt = "0.3"
 [dev-dependencies]
 assert_cmd = "1.0"
 predicates = "1.0"
+test-case = "1.1"
