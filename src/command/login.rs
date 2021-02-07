@@ -12,9 +12,9 @@ pub(crate) struct Login {
     #[structopt(flatten)]
     opts: RootOpts,
 
-    #[structopt(long, value_name = "EMAIL")]
+    #[structopt(long, env, hide_env_values = true)]
     email: Option<String>,
-    #[structopt(long, value_name = "PASSWORD")]
+    #[structopt(long, env, hide_env_values = true)]
     password: Option<String>,
 }
 
