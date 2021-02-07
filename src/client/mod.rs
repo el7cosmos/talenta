@@ -44,6 +44,7 @@ impl LoginData {
 enum CalendarEventType {
     B,
     N,
+    T,
 }
 
 #[derive(Deserialize, Debug)]
