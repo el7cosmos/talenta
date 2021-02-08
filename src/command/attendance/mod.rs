@@ -95,6 +95,7 @@ impl Command for Attendance {
         match self.cmd {
             None => {
                 super::holiday::check_holiday(self.date.into(), client)?;
+                super::time_off::check_time_off(self.date.into(), client)?;
                 self.execute(client)
             }
             Some(cmd) => match cmd {

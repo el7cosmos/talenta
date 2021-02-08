@@ -60,6 +60,22 @@ struct CalendarData {
     events: Vec<CalendarEvent>,
 }
 
+#[derive(Deserialize, Debug)]
+struct TimeOffRequestData {
+    start_date: NaiveDate,
+    end_date: NaiveDate,
+}
+
+#[derive(Deserialize, Debug)]
+struct TimeOffRequestList {
+    data: Vec<TimeOffRequestData>,
+}
+
+#[derive(Deserialize, Debug)]
+struct HistoryRequestData {
+    time_off_request: TimeOffRequestList,
+}
+
 #[allow(non_snake_case)]
 #[derive(Serialize, Debug)]
 struct AttendanceRequestBody {
@@ -214,6 +230,21 @@ impl Client {
         }
     }
 
+    fn history_request_time_off(
+        &self,
+        year: i32,
+        month: u32,
+    ) -> Result<ApiResponse<HistoryRequestData>> {
+        let mut url = Client::build_url("history-request/timeoff")?;
+        url.query_pairs_mut()
+            .extend_pairs(&[("month", month.to_string()), ("year", year.to_string())]);
+
+        match &self.token {
+            None => Err(anyhow::anyhow!("Not logged in yet")),
+            Some(token) => Ok(self.client.get(url).bearer_auth(token).send()?.json()?),
+        }
+    }
+
     pub(super) fn token(&self) -> &Option<String> {
         &self.token
     }
@@ -248,4 +279,20 @@ pub(crate) fn is_holiday(date: NaiveDate, client: &Client) -> Result<bool> {
     }
 
     Ok(false)
+}
+
+pub(crate) fn is_time_off(date: NaiveDate, client: &Client) -> Result<bool> {
+    let history = client.history_request_time_off(date.year(), date.month())?;
+    match history.data {
+        None => Ok(false),
+        Some(data) => {
+            for time_off in data.time_off_request.data {
+                if time_off.start_date <= date && time_off.end_date >= date {
+                    return Ok(true);
+                }
+            }
+
+            Ok(false)
+        }
+    }
 }

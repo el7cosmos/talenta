@@ -26,6 +26,7 @@ pub(crate) struct Live {
 impl Command for Live {
     fn run(self, client: &Client) -> anyhow::Result<String> {
         super::holiday::check_holiday(Local::today().naive_local(), client)?;
+        super::time_off::check_time_off(Local::today().naive_local(), client)?;
 
         let theme = self.opts.theme;
 

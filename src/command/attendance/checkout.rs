@@ -33,6 +33,7 @@ pub(super) struct Checkout {
 impl Command for Checkout {
     fn run(self, client: &Client) -> anyhow::Result<String> {
         crate::command::holiday::check_holiday(self.date.into(), client)?;
+        crate::command::time_off::check_time_off(self.date.into(), client)?;
 
         let theme = self.opts.theme;
 

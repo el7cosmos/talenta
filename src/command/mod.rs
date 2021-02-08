@@ -2,6 +2,7 @@ mod attendance;
 mod holiday;
 mod live;
 mod login;
+mod time_off;
 
 use crate::client::Client;
 use crate::command::attendance::Attendance;
