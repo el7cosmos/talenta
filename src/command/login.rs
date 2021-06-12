@@ -1,11 +1,11 @@
 use super::Command;
-use crate::client::Client;
 use crate::command::RootOpts;
 use crate::config::Config;
 use anyhow::Result;
 use dialoguer::{Input, Password};
 use reqwest::StatusCode;
 use structopt::StructOpt;
+use talenta::client::Client;
 
 #[derive(Default, StructOpt)]
 pub(crate) struct Login {

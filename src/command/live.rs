@@ -1,9 +1,9 @@
-use crate::client::Client;
 use crate::command::{Command, RootOpts};
 use chrono::Local;
 use dialoguer::{Confirm, Input};
 use reqwest::StatusCode;
 use structopt::StructOpt;
+use talenta::client::Client;
 
 const DEFAULT_LATITUDE: f64 = -6.2093236;
 const DEFAULT_LONGITUDE: f64 = 106.8186946;

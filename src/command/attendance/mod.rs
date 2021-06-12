@@ -5,7 +5,6 @@ use super::attendance::checkin::Checkin;
 use super::attendance::checkout::Checkout;
 use super::Command;
 use super::RootOpts;
-use crate::client::Client;
 use crate::date::Date;
 use crate::time::Time;
 use ansi_term::Colour;
@@ -13,6 +12,7 @@ use anyhow::{anyhow, Result};
 use dialoguer::Input;
 use reqwest::StatusCode;
 use structopt::StructOpt;
+use talenta::client::Client;
 
 #[derive(StructOpt)]
 enum AttendanceCommand {

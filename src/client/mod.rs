@@ -8,34 +8,34 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
-pub(super) struct ApiResponse<T> {
+pub struct ApiResponse<T> {
     message: String,
     status: u16,
     data: Option<T>,
 }
 
 impl<T> ApiResponse<T> {
-    pub(super) fn message(&self) -> &str {
+    pub fn message(&self) -> &str {
         &self.message
     }
-    pub(super) fn status(&self) -> u16 {
+    pub fn status(&self) -> u16 {
         self.status
     }
-    pub(super) fn data(&self) -> &Option<T> {
+    pub fn data(&self) -> &Option<T> {
         &self.data
     }
 }
 
 #[derive(Deserialize, Debug)]
-pub(super) struct ResponseData {}
+pub struct ResponseData {}
 
 #[derive(Deserialize, Debug)]
-pub(super) struct LoginData {
+pub struct LoginData {
     token: String,
 }
 
 impl LoginData {
-    pub(super) fn token(&self) -> &str {
+    pub fn token(&self) -> &str {
         &self.token
     }
 }
@@ -98,7 +98,7 @@ struct LiveAttendanceRequestBody {
 }
 
 #[derive(Debug)]
-pub(super) struct Client {
+pub struct Client {
     client: blocking::Client,
     token: Option<String>,
 }
@@ -124,7 +124,7 @@ impl Default for Client {
 }
 
 impl Client {
-    pub(super) fn login(&self, email: &str, password: &str) -> Result<ApiResponse<LoginData>> {
+    pub fn login(&self, email: &str, password: &str) -> Result<ApiResponse<LoginData>> {
         let mut map = HashMap::new();
         map.insert("email", email);
         map.insert("password", password);
@@ -136,7 +136,7 @@ impl Client {
             .json()?)
     }
 
-    pub(super) fn attendance_request(
+    pub fn attendance_request(
         &self,
         reason: &str,
         date: NaiveDate,
@@ -181,7 +181,7 @@ impl Client {
         }
     }
 
-    pub(super) fn live_attendance(
+    pub fn live_attendance(
         &self,
         status: &str,
         latitude: f64,
@@ -245,11 +245,11 @@ impl Client {
         }
     }
 
-    pub(super) fn token(&self) -> &Option<String> {
+    pub fn token(&self) -> &Option<String> {
         &self.token
     }
 
-    pub(super) fn set_token(&mut self, token: &str) {
+    pub fn set_token(&mut self, token: &str) {
         self.token = Some(token.into());
     }
 
@@ -263,7 +263,7 @@ impl Client {
     }
 }
 
-pub(crate) fn is_holiday(date: NaiveDate, client: &Client) -> Result<bool> {
+pub fn is_holiday(date: NaiveDate, client: &Client) -> Result<bool> {
     let calendar = client.calendar(date.year(), date.month(), date.day(), date.day())?;
     if calendar.status == 200 {
         match calendar.data {
@@ -281,7 +281,7 @@ pub(crate) fn is_holiday(date: NaiveDate, client: &Client) -> Result<bool> {
     Ok(false)
 }
 
-pub(crate) fn is_time_off(date: NaiveDate, client: &Client) -> Result<bool> {
+pub fn is_time_off(date: NaiveDate, client: &Client) -> Result<bool> {
     let history = client.history_request_time_off(date.year(), date.month())?;
     match history.data {
         None => Ok(false),

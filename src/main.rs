@@ -4,15 +4,15 @@ use ansi_term::Colour;
 use std::io::{self, Write};
 use std::process;
 use structopt::StructOpt;
+use talenta::client::Client;
 
-mod client;
 mod command;
 mod config;
 mod date;
 mod time;
 
 fn main() {
-    let mut client = client::Client::default();
+    let mut client = Client::default();
     let config = Config::load().unwrap();
     if let Some(token) = config.token() {
         client.set_token(token)

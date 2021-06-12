@@ -1,10 +1,10 @@
-use crate::client::Client;
 use crate::command::{Command, RootOpts};
 use crate::date::Date;
 use crate::time::Time;
 use dialoguer::Input;
 use reqwest::StatusCode;
 use structopt::StructOpt;
+use talenta::client::Client;
 
 #[derive(Default, StructOpt)]
 #[structopt(about = "Request checkin only attendance")]

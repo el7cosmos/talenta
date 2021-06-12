@@ -4,7 +4,6 @@ mod live;
 mod login;
 mod time_off;
 
-use crate::client::Client;
 use crate::command::attendance::Attendance;
 use crate::command::live::Live;
 use crate::command::login::Login;
@@ -12,6 +11,7 @@ use anyhow::Result;
 use dialoguer::theme::ColorfulTheme;
 use structopt::clap::AppSettings;
 use structopt::StructOpt;
+use talenta::client::Client;
 
 #[derive(Default, StructOpt)]
 pub(super) struct RootOpts {
