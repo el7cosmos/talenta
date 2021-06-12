@@ -3,7 +3,6 @@ use crate::command::RootOpts;
 use crate::config::Config;
 use anyhow::Result;
 use dialoguer::{Input, Password};
-use reqwest::StatusCode;
 use structopt::StructOpt;
 use talenta::client::Client;
 
@@ -37,12 +36,7 @@ impl Command for Login {
         });
 
         let login = client.login(&email, &password)?;
-        let status = StatusCode::from_u16(login.status())?;
-
-        if status.is_success() {
-            Config::with_token(login.data().as_ref().unwrap().token().into()).store()?;
-            return Ok(login.message().to_string());
-        }
-        Err(anyhow::anyhow!("{}", login.message()))
+        Config::with_token(login.data.unwrap().token).store()?;
+        Ok(login.message)
     }
 }

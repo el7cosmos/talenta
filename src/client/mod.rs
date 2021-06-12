@@ -1,9 +1,12 @@
+mod response;
+
 use anyhow::Result;
 use chrono::Datelike;
 use chrono::NaiveDate;
 use chrono::NaiveTime;
 use reqwest::blocking;
 use reqwest::Url;
+use response::{Login, Root};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -28,17 +31,6 @@ impl<T> ApiResponse<T> {
 
 #[derive(Deserialize, Debug)]
 pub struct ResponseData {}
-
-#[derive(Deserialize, Debug)]
-pub struct LoginData {
-    token: String,
-}
-
-impl LoginData {
-    pub fn token(&self) -> &str {
-        &self.token
-    }
-}
 
 #[derive(Deserialize, Debug)]
 enum CalendarEventType {
@@ -124,16 +116,17 @@ impl Default for Client {
 }
 
 impl Client {
-    pub fn login(&self, email: &str, password: &str) -> Result<ApiResponse<LoginData>> {
+    pub fn login(&self, email: &str, password: &str) -> Result<Root<Login>> {
         let mut map = HashMap::new();
         map.insert("email", email);
         map.insert("password", password);
-        Ok(self
+        let response: Root<Login> = self
             .client
             .post(Client::build_url("login")?)
             .json(&map)
             .send()?
-            .json()?)
+            .json()?;
+        response.result()
     }
 
     pub fn attendance_request(
