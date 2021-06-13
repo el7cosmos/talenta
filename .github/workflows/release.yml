@@ -13,6 +13,7 @@ jobs:
     name: Create release
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v2.3.4
       - name: Create release
         run: gh release create "${GITHUB_REF#refs/tags/}"
         env:
