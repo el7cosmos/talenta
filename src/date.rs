@@ -29,9 +29,9 @@ impl std::str::FromStr for Date {
     }
 }
 
-impl Into<NaiveDate> for Date {
-    fn into(self) -> NaiveDate {
-        self.0
+impl From<Date> for NaiveDate {
+    fn from(date: Date) -> Self {
+        date.0
     }
 }
 

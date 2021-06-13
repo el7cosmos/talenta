@@ -28,15 +28,15 @@ impl std::str::FromStr for Time {
     }
 }
 
-impl Into<NaiveTime> for Time {
-    fn into(self) -> NaiveTime {
-        self.0
+impl From<Time> for NaiveTime {
+    fn from(time: Time) -> Self {
+        time.0
     }
 }
 
-impl Into<Option<NaiveTime>> for Time {
-    fn into(self) -> Option<NaiveTime> {
-        Some(self.0)
+impl From<Time> for Option<NaiveTime> {
+    fn from(time: Time) -> Self {
+        Some(time.0)
     }
 }
 
