@@ -15,7 +15,6 @@ mod response;
 #[derive(Deserialize, Debug)]
 pub struct ResponseData {}
 
-#[allow(non_snake_case)]
 #[derive(Serialize, Debug)]
 struct AttendanceRequestBody {
     datepicker_request_submit: String,
@@ -24,8 +23,10 @@ struct AttendanceRequestBody {
     hour_checkout: Option<String>,
     minute_checkout: Option<String>,
     reason: String,
-    useCheckIn: bool,
-    useCheckOut: bool,
+    #[serde(rename = "useCheckIn")]
+    use_check_in: bool,
+    #[serde(rename = "useCheckOut")]
+    use_check_out: bool,
 }
 
 #[derive(Serialize, Debug)]
@@ -90,8 +91,8 @@ impl Client {
             hour_checkout: checkout.map(|time| time.format("%H").to_string()),
             minute_checkout: checkout.map(|time| time.format("%M").to_string()),
             reason: reason.into(),
-            useCheckIn: checkin.is_some(),
-            useCheckOut: checkout.is_some(),
+            use_check_in: checkin.is_some(),
+            use_check_out: checkout.is_some(),
         };
 
         match &self.token {
