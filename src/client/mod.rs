@@ -192,3 +192,21 @@ pub fn is_time_off(date: NaiveDate, client: &Client) -> Result<bool> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::error::Error;
+
+    use reqwest::Url;
+
+    use crate::client::Client;
+
+    #[test]
+    fn build_url() -> Result<(), Box<dyn Error>> {
+        assert_eq!(
+            Url::parse("https://api-mobile.talenta.co/api/v1/path")?,
+            Client::build_url("path")?
+        );
+        Ok(())
+    }
+}
