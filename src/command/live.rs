@@ -1,7 +1,6 @@
 use crate::command::{Command, RootOpts};
 use chrono::Local;
 use dialoguer::{Confirm, Input};
-use reqwest::StatusCode;
 use structopt::StructOpt;
 use talenta::client::Client;
 
@@ -62,12 +61,7 @@ impl Command for Live {
                 longitude,
                 self.description,
             )?;
-            let status = StatusCode::from_u16(response.status())?;
-
-            return match status.is_success() {
-                true => Ok(response.message().to_string()),
-                false => Err(anyhow::anyhow!("{}", response.message())),
-            };
+            return response.result().map(|response| response.message);
         }
 
         std::process::exit(1);

@@ -10,7 +10,6 @@ use crate::time::Time;
 use ansi_term::Colour;
 use anyhow::{anyhow, Result};
 use dialoguer::Input;
-use reqwest::StatusCode;
 use structopt::StructOpt;
 use talenta::client::Client;
 
@@ -75,11 +74,7 @@ impl Attendance {
             checkin_time.into(),
             checkout_time.into(),
         )?;
-        let status = StatusCode::from_u16(response.status())?;
-        match status.is_success() {
-            true => Ok(response.message().to_string()),
-            false => Err(anyhow!("{}", response.message())),
-        }
+        response.result().map(|response| response.message)
     }
 }
 

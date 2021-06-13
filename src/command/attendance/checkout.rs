@@ -2,7 +2,6 @@ use crate::command::{Command, RootOpts};
 use crate::date::Date;
 use crate::time::Time;
 use dialoguer::Input;
-use reqwest::StatusCode;
 use structopt::StructOpt;
 use talenta::client::Client;
 
@@ -46,11 +45,6 @@ impl Command for Checkout {
 
         let response =
             client.attendance_request(&reason, self.date.into(), None, self.time.into())?;
-        let status = StatusCode::from_u16(response.status())?;
-
-        if status.is_success() {
-            return Ok(response.message().to_string());
-        }
-        Err(anyhow::anyhow!("{}", response.message()))
+        response.result().map(|response| response.message)
     }
 }

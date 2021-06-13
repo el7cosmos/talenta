@@ -7,14 +7,14 @@ use serde::{Deserialize, Deserializer};
 use std::convert::TryFrom;
 
 #[derive(Deserialize, Debug)]
-pub struct Root<T> {
+pub struct Response<T> {
     pub message: String,
     #[serde(deserialize_with = "deserialize_status")]
     status: StatusCode,
     pub data: Option<T>,
 }
 
-impl<T> Root<T> {
+impl<T> Response<T> {
     pub fn result(self) -> anyhow::Result<Self> {
         match self.status.is_success() {
             true => Ok(self),
@@ -29,7 +29,7 @@ pub struct Login {
 }
 
 #[derive(Deserialize, Debug)]
-enum CalendarEventType {
+pub enum CalendarEventType {
     B,
     N,
     T,
@@ -40,13 +40,13 @@ pub struct CalendarEvent {
     title: String,
     start: NaiveDate,
     #[serde(rename = "type")]
-    event_type: CalendarEventType,
+    pub event_type: CalendarEventType,
     amount_days: String,
 }
 
 #[derive(Default, Deserialize, Debug)]
 pub struct Calendar {
-    events: Vec<CalendarEvent>,
+    pub events: Vec<CalendarEvent>,
 }
 
 fn deserialize_status<'de, D>(deserializer: D) -> Result<StatusCode, D::Error>
@@ -67,8 +67,8 @@ where
             E: Error,
         {
             let unexpected = Unexpected::Unsigned(v);
-            let code = u16::try_from(v).or(Err(Error::invalid_type(unexpected, &self)))?;
-            StatusCode::from_u16(code).or(Err(Error::invalid_type(unexpected, &self)))
+            let code = u16::try_from(v).map_err(|_| Error::invalid_type(unexpected, &self))?;
+            StatusCode::from_u16(code).map_err(|_| Error::invalid_type(unexpected, &self))
         }
     }
 

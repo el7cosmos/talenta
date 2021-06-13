@@ -1,56 +1,17 @@
 mod response;
 
+use crate::client::response::{Calendar, CalendarEventType, Login, Response};
 use anyhow::Result;
 use chrono::Datelike;
 use chrono::NaiveDate;
 use chrono::NaiveTime;
 use reqwest::blocking;
 use reqwest::Url;
-use response::{Login, Root};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
-pub struct ApiResponse<T> {
-    message: String,
-    status: u16,
-    data: Option<T>,
-}
-
-impl<T> ApiResponse<T> {
-    pub fn message(&self) -> &str {
-        &self.message
-    }
-    pub fn status(&self) -> u16 {
-        self.status
-    }
-    pub fn data(&self) -> &Option<T> {
-        &self.data
-    }
-}
-
-#[derive(Deserialize, Debug)]
 pub struct ResponseData {}
-
-#[derive(Deserialize, Debug)]
-enum CalendarEventType {
-    B,
-    N,
-    T,
-}
-
-#[derive(Deserialize, Debug)]
-struct CalendarEvent {
-    #[serde(rename = "type")]
-    event_type: CalendarEventType,
-    start: NaiveDate,
-    title: String,
-}
-
-#[derive(Deserialize, Debug)]
-struct CalendarData {
-    events: Vec<CalendarEvent>,
-}
 
 #[derive(Deserialize, Debug)]
 struct TimeOffRequestData {
@@ -116,11 +77,11 @@ impl Default for Client {
 }
 
 impl Client {
-    pub fn login(&self, email: &str, password: &str) -> Result<Root<Login>> {
+    pub fn login(&self, email: &str, password: &str) -> Result<Response<Login>> {
         let mut map = HashMap::new();
         map.insert("email", email);
         map.insert("password", password);
-        let response: Root<Login> = self
+        let response: Response<Login> = self
             .client
             .post(Client::build_url("login")?)
             .json(&map)
@@ -135,7 +96,7 @@ impl Client {
         date: NaiveDate,
         checkin: Option<NaiveTime>,
         checkout: Option<NaiveTime>,
-    ) -> Result<ApiResponse<ResponseData>> {
+    ) -> Result<Response<ResponseData>> {
         let json = AttendanceRequestBody {
             datepicker_request_submit: date.to_string(),
             hour_checkin: match checkin {
@@ -161,16 +122,13 @@ impl Client {
 
         match &self.token {
             None => Err(anyhow::anyhow!("Not logged in yet")),
-            Some(token) => {
-                let response = self
-                    .client
-                    .post(Client::build_url("attendance-request")?)
-                    .bearer_auth(token)
-                    .json(&json)
-                    .send()?;
-
-                Ok(response.json()?)
-            }
+            Some(token) => Ok(self
+                .client
+                .post(Client::build_url("attendance-request")?)
+                .bearer_auth(token)
+                .json(&json)
+                .send()?
+                .json()?),
         }
     }
 
@@ -180,7 +138,7 @@ impl Client {
         latitude: f64,
         longitude: f64,
         description: Option<String>,
-    ) -> Result<ApiResponse<ResponseData>> {
+    ) -> Result<Response<ResponseData>> {
         let form = LiveAttendanceRequestBody {
             status: status.to_string(),
             latitude,
@@ -206,7 +164,7 @@ impl Client {
         month: u32,
         start_date: u32,
         end_date: u32,
-    ) -> Result<ApiResponse<CalendarData>> {
+    ) -> Result<Response<Calendar>> {
         let start_date = NaiveDate::from_ymd(year, month, start_date);
         let end_date = NaiveDate::from_ymd(year, month, end_date);
 
@@ -227,7 +185,7 @@ impl Client {
         &self,
         year: i32,
         month: u32,
-    ) -> Result<ApiResponse<HistoryRequestData>> {
+    ) -> Result<Response<HistoryRequestData>> {
         let mut url = Client::build_url("history-request/timeoff")?;
         url.query_pairs_mut()
             .extend_pairs(&[("month", month.to_string()), ("year", year.to_string())]);
@@ -258,14 +216,12 @@ impl Client {
 
 pub fn is_holiday(date: NaiveDate, client: &Client) -> Result<bool> {
     let calendar = client.calendar(date.year(), date.month(), date.day(), date.day())?;
-    if calendar.status == 200 {
-        match calendar.data {
-            None => return Ok(false),
-            Some(data) => {
-                for event in data.events {
-                    if let CalendarEventType::N = event.event_type {
-                        return Ok(true);
-                    }
+    match calendar.data {
+        None => return Ok(false),
+        Some(data) => {
+            for event in data.events {
+                if let CalendarEventType::N = event.event_type {
+                    return Ok(true);
                 }
             }
         }
