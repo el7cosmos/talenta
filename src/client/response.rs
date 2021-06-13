@@ -1,10 +1,10 @@
+use std::convert::TryFrom;
 use std::fmt::Formatter;
 
 use chrono::NaiveDate;
 use reqwest::StatusCode;
 use serde::de::{Error, Unexpected, Visitor};
 use serde::{Deserialize, Deserializer};
-use std::convert::TryFrom;
 
 #[derive(Deserialize, Debug)]
 pub struct Response<T> {
@@ -47,6 +47,22 @@ pub struct CalendarEvent {
 #[derive(Default, Deserialize, Debug)]
 pub struct Calendar {
     pub events: Vec<CalendarEvent>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct TimeOffRequestData {
+    pub start_date: NaiveDate,
+    pub end_date: NaiveDate,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct TimeOffRequestList {
+    pub data: Vec<TimeOffRequestData>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct HistoryRequest {
+    pub time_off_request: TimeOffRequestList,
 }
 
 fn deserialize_status<'de, D>(deserializer: D) -> Result<StatusCode, D::Error>

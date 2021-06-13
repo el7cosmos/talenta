@@ -1,6 +1,5 @@
-mod response;
+use std::collections::HashMap;
 
-use crate::client::response::{Calendar, CalendarEventType, Login, Response};
 use anyhow::Result;
 use chrono::Datelike;
 use chrono::NaiveDate;
@@ -8,26 +7,13 @@ use chrono::NaiveTime;
 use reqwest::blocking;
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+
+use crate::client::response::{Calendar, CalendarEventType, HistoryRequest, Login, Response};
+
+mod response;
 
 #[derive(Deserialize, Debug)]
 pub struct ResponseData {}
-
-#[derive(Deserialize, Debug)]
-struct TimeOffRequestData {
-    start_date: NaiveDate,
-    end_date: NaiveDate,
-}
-
-#[derive(Deserialize, Debug)]
-struct TimeOffRequestList {
-    data: Vec<TimeOffRequestData>,
-}
-
-#[derive(Deserialize, Debug)]
-struct HistoryRequestData {
-    time_off_request: TimeOffRequestList,
-}
 
 #[allow(non_snake_case)]
 #[derive(Serialize, Debug)]
@@ -169,11 +155,7 @@ impl Client {
         }
     }
 
-    fn history_request_time_off(
-        &self,
-        year: i32,
-        month: u32,
-    ) -> Result<Response<HistoryRequestData>> {
+    fn history_request_time_off(&self, year: i32, month: u32) -> Result<Response<HistoryRequest>> {
         let mut url = Client::build_url("history-request/timeoff")?;
         url.query_pairs_mut()
             .extend_pairs(&[("month", month.to_string()), ("year", year.to_string())]);
