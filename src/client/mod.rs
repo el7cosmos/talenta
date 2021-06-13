@@ -6,36 +6,16 @@ use chrono::NaiveDate;
 use chrono::NaiveTime;
 use reqwest::blocking;
 use reqwest::Url;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
-use crate::client::response::{Calendar, CalendarEventType, HistoryRequest, Login, Response};
+use request::{Attendance, LiveAttendance};
+use response::{Calendar, CalendarEventType, HistoryRequest, Login, Response};
 
+mod request;
 mod response;
 
 #[derive(Deserialize, Debug)]
 pub struct ResponseData {}
-
-#[derive(Serialize, Debug)]
-struct AttendanceRequestBody {
-    datepicker_request_submit: String,
-    hour_checkin: Option<String>,
-    minute_checkin: Option<String>,
-    hour_checkout: Option<String>,
-    minute_checkout: Option<String>,
-    reason: String,
-    #[serde(rename = "useCheckIn")]
-    use_check_in: bool,
-    #[serde(rename = "useCheckOut")]
-    use_check_out: bool,
-}
-
-#[derive(Serialize, Debug)]
-struct LiveAttendanceRequestBody {
-    status: String,
-    latitude: f64,
-    longitude: f64,
-    description: Option<String>,
-}
 
 #[derive(Debug)]
 pub struct Client {
@@ -84,7 +64,7 @@ impl Client {
         checkin: Option<NaiveTime>,
         checkout: Option<NaiveTime>,
     ) -> Result<Response<ResponseData>> {
-        let json = AttendanceRequestBody {
+        let json = Attendance {
             datepicker_request_submit: date.to_string(),
             hour_checkin: checkin.map(|time| time.format("%H").to_string()),
             minute_checkin: checkin.map(|time| time.format("%M").to_string()),
@@ -114,7 +94,7 @@ impl Client {
         longitude: f64,
         description: Option<String>,
     ) -> Result<Response<ResponseData>> {
-        let form = LiveAttendanceRequestBody {
+        let form = LiveAttendance {
             status: status.to_string(),
             latitude,
             longitude,
