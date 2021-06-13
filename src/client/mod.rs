@@ -99,22 +99,10 @@ impl Client {
     ) -> Result<Response<ResponseData>> {
         let json = AttendanceRequestBody {
             datepicker_request_submit: date.to_string(),
-            hour_checkin: match checkin {
-                Some(time) => Some(time.format("%H").to_string()),
-                None => None,
-            },
-            minute_checkin: match checkin {
-                Some(time) => Some(time.format("%M").to_string()),
-                None => None,
-            },
-            hour_checkout: match checkout {
-                Some(time) => Some(time.format("%H").to_string()),
-                None => None,
-            },
-            minute_checkout: match checkout {
-                Some(time) => Some(time.format("%M").to_string()),
-                None => None,
-            },
+            hour_checkin: checkin.map(|time| time.format("%H").to_string()),
+            minute_checkin: checkin.map(|time| time.format("%M").to_string()),
+            hour_checkout: checkout.map(|time| time.format("%H").to_string()),
+            minute_checkout: checkout.map(|time| time.format("%M").to_string()),
             reason: reason.into(),
             useCheckIn: checkin.is_some(),
             useCheckOut: checkout.is_some(),
