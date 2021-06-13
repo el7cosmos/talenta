@@ -6,16 +6,12 @@ use chrono::NaiveDate;
 use chrono::NaiveTime;
 use reqwest::blocking;
 use reqwest::Url;
-use serde::Deserialize;
 
 use request::{Attendance, LiveAttendance};
-use response::{Calendar, CalendarEventType, HistoryRequest, Login, Response};
+use response::{Calendar, CalendarEventType, Data, HistoryRequest, Login, Response};
 
 mod request;
 mod response;
-
-#[derive(Deserialize, Debug)]
-pub struct ResponseData {}
 
 #[derive(Debug)]
 pub struct Client {
@@ -63,7 +59,7 @@ impl Client {
         date: NaiveDate,
         checkin: Option<NaiveTime>,
         checkout: Option<NaiveTime>,
-    ) -> Result<Response<ResponseData>> {
+    ) -> Result<Response<Data>> {
         let json = Attendance {
             datepicker_request_submit: date.to_string(),
             hour_checkin: checkin.map(|time| time.format("%H").to_string()),
@@ -93,7 +89,7 @@ impl Client {
         latitude: f64,
         longitude: f64,
         description: Option<String>,
-    ) -> Result<Response<ResponseData>> {
+    ) -> Result<Response<Data>> {
         let form = LiveAttendance {
             status: status.to_string(),
             latitude,

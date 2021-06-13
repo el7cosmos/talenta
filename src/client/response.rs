@@ -23,7 +23,10 @@ impl<T> Response<T> {
     }
 }
 
-#[derive(Default, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
+pub struct Data {}
+
+#[derive(Deserialize, Debug)]
 pub struct Login {
     pub token: String,
 }
@@ -44,7 +47,7 @@ pub struct CalendarEvent {
     amount_days: String,
 }
 
-#[derive(Default, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Calendar {
     pub events: Vec<CalendarEvent>,
 }
