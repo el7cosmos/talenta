@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
-use chrono::Datelike;
-use chrono::NaiveDate;
-use chrono::NaiveTime;
+use chrono::{Datelike, Duration, NaiveDate, NaiveTime};
 use reqwest::blocking;
 use reqwest::Url;
 
@@ -109,26 +107,27 @@ impl Client {
         }
     }
 
-    fn calendar(
-        &self,
-        year: i32,
-        month: u32,
-        start_date: u32,
-        end_date: u32,
-    ) -> Result<Response<Calendar>> {
-        let start_date = NaiveDate::from_ymd(year, month, start_date);
-        let end_date = NaiveDate::from_ymd(year, month, end_date);
-
-        let mut url = Client::build_url("calendar")?;
-        url.query_pairs_mut().extend_pairs(&[
-            ("startDate", start_date.to_string()),
-            ("endDate", end_date.to_string()),
-            ("month", month.to_string()),
-        ]);
-
+    fn calendar(&self, year: i32, month: u32, date: Option<u32>) -> Result<Response<Calendar>> {
         match &self.token {
             None => Err(anyhow::anyhow!("Not logged in yet")),
-            Some(token) => Ok(self.client.get(url).bearer_auth(token).send()?.json()?),
+            Some(token) => {
+                let (start_date, end_date) = Client::calendar_date(year, month, date);
+
+                let mut url = Client::build_url("calendar")?;
+                url.query_pairs_mut().extend_pairs(&[
+                    ("startDate", start_date.to_string()),
+                    ("endDate", end_date.to_string()),
+                    ("month", month.to_string()),
+                ]);
+
+                let response = self
+                    .client
+                    .get(url)
+                    .bearer_auth(token)
+                    .send()?
+                    .json::<Response<Calendar>>()?;
+                response.result()
+            }
         }
     }
 
@@ -159,10 +158,29 @@ impl Client {
 
         Ok(url)
     }
+
+    fn calendar_date(year: i32, month: u32, date: Option<u32>) -> (NaiveDate, NaiveDate) {
+        match date {
+            None => {
+                let next_month = match month {
+                    12 => NaiveDate::from_ymd(year + 1, 1, 1),
+                    _ => NaiveDate::from_ymd(year, month + 1, 1),
+                };
+                (
+                    NaiveDate::from_ymd(year, month, 1),
+                    next_month - Duration::days(1),
+                )
+            }
+            Some(date) => {
+                let naive_date = NaiveDate::from_ymd(year, month, date);
+                (naive_date, naive_date)
+            }
+        }
+    }
 }
 
 pub fn is_holiday(date: NaiveDate, client: &Client) -> Result<bool> {
-    let calendar = client.calendar(date.year(), date.month(), date.day(), date.day())?;
+    let calendar = client.calendar(date.year(), date.month(), Some(date.day()))?;
     match calendar.data {
         None => return Ok(false),
         Some(data) => {
@@ -200,6 +218,7 @@ mod tests {
     use reqwest::Url;
 
     use crate::client::Client;
+    use chrono::NaiveDate;
 
     #[test]
     fn build_url() -> Result<(), Box<dyn Error>> {
@@ -208,5 +227,16 @@ mod tests {
             Client::build_url("path")?
         );
         Ok(())
+    }
+
+    #[test]
+    fn calendar_date() {
+        assert_eq!(
+            (
+                NaiveDate::from_ymd(2021, 12, 1),
+                NaiveDate::from_ymd(2021, 12, 31)
+            ),
+            Client::calendar_date(2021, 12, None)
+        );
     }
 }
