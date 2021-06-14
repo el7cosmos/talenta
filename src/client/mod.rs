@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
-use chrono::{Datelike, Duration, NaiveDate, NaiveTime};
+use chrono::{Duration, NaiveDate, NaiveTime};
 use reqwest::blocking;
 use reqwest::Url;
 
@@ -131,14 +131,26 @@ impl Client {
         }
     }
 
-    fn history_request_time_off(&self, year: i32, month: u32) -> Result<Response<HistoryRequest>> {
-        let mut url = Client::build_url("history-request/timeoff")?;
-        url.query_pairs_mut()
-            .extend_pairs(&[("month", month.to_string()), ("year", year.to_string())]);
-
+    pub fn history_request_time_off(
+        &self,
+        year: i32,
+        month: u32,
+    ) -> Result<Response<HistoryRequest>> {
         match &self.token {
             None => Err(anyhow::anyhow!("Not logged in yet")),
-            Some(token) => Ok(self.client.get(url).bearer_auth(token).send()?.json()?),
+            Some(token) => {
+                let mut url = Client::build_url("history-request/timeoff")?;
+                url.query_pairs_mut()
+                    .extend_pairs(&[("month", month.to_string()), ("year", year.to_string())]);
+
+                let response = self
+                    .client
+                    .get(url)
+                    .bearer_auth(token)
+                    .send()?
+                    .json::<Response<HistoryRequest>>()?;
+                response.result()
+            }
         }
     }
 
@@ -175,22 +187,6 @@ impl Client {
                 let naive_date = NaiveDate::from_ymd(year, month, date);
                 (naive_date, naive_date)
             }
-        }
-    }
-}
-
-pub fn is_time_off(date: NaiveDate, client: &Client) -> Result<bool> {
-    let history = client.history_request_time_off(date.year(), date.month())?;
-    match history.data {
-        None => Ok(false),
-        Some(data) => {
-            for time_off in data.time_off_request.data {
-                if time_off.start_date <= date && time_off.end_date >= date {
-                    return Ok(true);
-                }
-            }
-
-            Ok(false)
         }
     }
 }
