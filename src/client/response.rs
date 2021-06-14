@@ -40,7 +40,7 @@ pub enum CalendarEventType {
 
 #[derive(Deserialize, Debug)]
 pub struct CalendarEvent {
-    title: String,
+    pub title: String,
     start: NaiveDate,
     #[serde(rename = "type")]
     pub event_type: CalendarEventType,

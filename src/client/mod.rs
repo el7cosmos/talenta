@@ -6,10 +6,10 @@ use reqwest::blocking;
 use reqwest::Url;
 
 use request::{Attendance, LiveAttendance};
-use response::{Calendar, CalendarEventType, Data, HistoryRequest, Login, Response};
+use response::{Calendar, Data, HistoryRequest, Login, Response};
 
 mod request;
-mod response;
+pub mod response;
 
 #[derive(Debug)]
 pub struct Client {
@@ -107,7 +107,7 @@ impl Client {
         }
     }
 
-    fn calendar(&self, year: i32, month: u32, date: Option<u32>) -> Result<Response<Calendar>> {
+    pub fn calendar(&self, year: i32, month: u32, date: Option<u32>) -> Result<Response<Calendar>> {
         match &self.token {
             None => Err(anyhow::anyhow!("Not logged in yet")),
             Some(token) => {
@@ -177,22 +177,6 @@ impl Client {
             }
         }
     }
-}
-
-pub fn is_holiday(date: NaiveDate, client: &Client) -> Result<bool> {
-    let calendar = client.calendar(date.year(), date.month(), Some(date.day()))?;
-    match calendar.data {
-        None => return Ok(false),
-        Some(data) => {
-            for event in data.events {
-                if let CalendarEventType::N = event.event_type {
-                    return Ok(true);
-                }
-            }
-        }
-    }
-
-    Ok(false)
 }
 
 pub fn is_time_off(date: NaiveDate, client: &Client) -> Result<bool> {
