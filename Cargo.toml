@@ -26,6 +26,6 @@ serde = { version = "1.0", features = ["derive"] }
 structopt = "0.3"
 
 [dev-dependencies]
-assert_cmd = "1.0"
+assert_cmd = "2.0"
 predicates = "1.0"
 test-case = "1.1"
